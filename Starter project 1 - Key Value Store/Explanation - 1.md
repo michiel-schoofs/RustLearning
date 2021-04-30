@@ -56,7 +56,7 @@ let key: String = args.next().unwrap();
 
 if we don't pass in any arguments by doing `cargo run`  then we will get an exception like this:
 
-![image-20210429164541365](C:\Users\gebruiker\AppData\Roaming\Typora\typora-user-images\image-20210429164541365.png)
+![image-20210429164541365](.\md - images\rust - kv - 1.png)
 
 If we pass in arguments (this is done by prefixing the arguments with -- when using cargo) we see that it runs successful:
 
@@ -89,9 +89,11 @@ let value: String = args.next().expect("There was no value supplied");
 
 Now if we for example don't specify a value we get the following error message (using `cargo run -- hello`):
 
-![image-20210429184440864](C:\Users\gebruiker\AppData\Roaming\Typora\typora-user-images\image-20210429184440864.png)
+![image-20210429184440864](.\md - images\rust - kv - 2.png)
 
-Now we have to store the key and value to a file. So let's go to the [rust documentation](https://docs.rs/std). Here we see there's a library called FS that deals with filesystem manipulation including creating files so this is what we want to use. Here we can see there's a function write. The documentation here tells it all:
+Now we have to store the key and value to a file. So let's go to the [rust
+
+[ documentation](https://docs.rs/std). Here we see there's a library called FS that deals with filesystem manipulation including creating files so this is what we want to use. Here we can see there's a function write. The documentation here tells it all:
 
 > This function will create a file if it does not exist, and will entirely replace its contents if it does.
 
@@ -106,7 +108,7 @@ You see that we use a new macro called format. The format macro will format a st
 
 We see that we have a warning in our console if we use `cargo check`.
 
-![image-20210429185541391](C:\Users\gebruiker\AppData\Roaming\Typora\typora-user-images\image-20210429185541391.png)
+![image-20210429185541391](.\md - images\rust - kv - 3.png)
 
 In normal programming we will throw exceptions and handle them however Rust tries to warn you on any potential crashes that might occur and expects you to handle them accordingly. Our write function uses a Result which has a possible error. Rust is asking us to handle that error. A result type either completes successful or it returns an error.
 
