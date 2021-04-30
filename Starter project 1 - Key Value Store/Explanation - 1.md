@@ -56,7 +56,7 @@ let key: String = args.next().unwrap();
 
 if we don't pass in any arguments by doing `cargo run`  then we will get an exception like this:
 
-![image-20210429164541365](.\md - images\rust - kv - 1.png)
+![image-20210429164541365](https://github.com/michiel-schoofs/RustLearning/blob/main/Starter%20project%201%20-%20Key%20Value%20Store/md%20-%20images/rust%20-%20kv%20-%201.png)
 
 If we pass in arguments (this is done by prefixing the arguments with -- when using cargo) we see that it runs successful:
 
@@ -89,7 +89,7 @@ let value: String = args.next().expect("There was no value supplied");
 
 Now if we for example don't specify a value we get the following error message (using `cargo run -- hello`):
 
-![image-20210429184440864](.\md - images\rust - kv - 2.png)
+![image-20210429184440864](https://github.com/michiel-schoofs/RustLearning/blob/main/Starter%20project%201%20-%20Key%20Value%20Store/md%20-%20images/rust%20-%20kv%20-%202.png)
 
 Now we have to store the key and value to a file. So let's go to the [rust
 
@@ -108,7 +108,7 @@ You see that we use a new macro called format. The format macro will format a st
 
 We see that we have a warning in our console if we use `cargo check`.
 
-![image-20210429185541391](.\md - images\rust - kv - 3.png)
+![image-20210429185541391](https://github.com/michiel-schoofs/RustLearning/blob/main/Starter%20project%201%20-%20Key%20Value%20Store/md%20-%20images/rust%20-%20kv%20-%203.png)
 
 In normal programming we will throw exceptions and handle them however Rust tries to warn you on any potential crashes that might occur and expects you to handle them accordingly. Our write function uses a Result which has a possible error. Rust is asking us to handle that error. A result type either completes successful or it returns an error.
 
