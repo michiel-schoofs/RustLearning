@@ -1,5 +1,5 @@
 [package]
-name = "threading_closures_demo"
+name = "closures_demo"
 version = "0.1.0"
 authors = ["Michiel Schoofs <michiel.schoofs@student.hogent.be>"]
 edition = "2018"
