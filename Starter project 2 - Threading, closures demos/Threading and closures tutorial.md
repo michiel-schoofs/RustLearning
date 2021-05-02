@@ -90,3 +90,147 @@ fn main() {
 
 We see that there's a lot of calls in this function to our expensive function simulated_expensive_calculation. In the first if block it's even called twice.
 
+The first solution would be to move the function call to a variable and save the first if statement on executing multiple times the same function:
+
+```rust
+fn generate_workout(intensity: u32, random_number: u32) {
+    let calculated = simulated_expensive_calculation(intensity);
+    if intensity < 25 {
+        println!("Today, do {} pushups!",calculated);
+        println!("Next, do {} situps!",calculated);
+    } else {
+        if random_number == 3 {
+            println!("Take a break today! Remember to stay hydrated!");
+        } else {
+            println!("Today, run for {} minutes!",calculated);
+        }
+    }
+}
+```
+
+The disadvantage to this approach is that in the if block inside of the else block we don't need the calculated function at all considering it takes some time we're always waiting on it even if it's not necessary Hench slowing down our application.
+
+So what we can do is basically let the variable calculated hold the function itself and we only execute it whenever we need it. This is called a closure and the syntax is the following: Start with introducing the variable then after the equals sign specify the parameters within ||. This is similar to ruby and small talks. Next up we can execute the function using a normal function call:
+
+```rust
+fn generate_workout(intensity: u32, random_number: u32) {
+    let calculated = |num : u32| -> u32 {
+        println!("calculating slowly...");
+        thread::sleep(Duration::from_secs(2));
+        return num;
+    };
+
+    if intensity < 25 {
+        println!("Today, do {} pushups!",calculated(intensity));
+        println!("Next, do {} situps!",calculated(intensity));
+    } else {
+        if random_number == 3 {
+            println!("Take a break today! Remember to stay hydrated!");
+        } else {
+            println!("Today, run for {} minutes!",calculated(intensity));
+        }
+    }
+}
+```
+
+This solves the issue of our else if block but reintroduces the problem with the double if block. Closures have a solution for this however.
+
+Also note that you can omit a lot of optional syntax from the closure itself note that all of these are equivalent:
+
+````rust
+let add_1 = (x: u8) -> u8 {x + 1}
+let add_2 = |x: u8| {x+1};
+let add_3 = |x| {x+1};
+let add_4 = |x| x+1;
+````
+
+If we don't infer the type then it's possible to get an error. Namely if you call the same function with a string followed by an integer or call an illegal function on the inferred type within the enclosure. So this is quite unsafe code Hench why I prefer to specify everything.
+
+To solve the issue we can define a new structure called cacher I'm giving the implementation here and then providing an explanation for them:
+
+```rust
+struct Cache<T> where T: Fn(u32) -> u32{
+    func: T,
+    result: Option<u32>
+}
+
+impl<T> Cache<T> where T: Fn(u32) -> u32 {
+    fn new(calculation: T) -> Cache<T>{
+        Cache{
+            func: calculation,
+            result: None
+        }
+    }
+
+    fn value(&mut self,arg: u32) -> u32{
+        match self.result{
+            Some(v) => v,
+            None => {
+                let v = (self.func)(arg);
+                self.result = Some(v);
+                v
+            }
+        }
+    }
+}
+```
+
+First we make a generic structure that takes a closure as it's generic parameter. The closure itself implements something called a trait. A function has a trait of Fn  so we can use this to infer that we take in a closure in our generic parameter T. The next field result is an Option<u32>. Because when the structure is just made it's not gonna have a result so None and after it's called once it will contain a result. This is the definition of an Option it's either None or a specific value wrapped in Some.
+
+We provide an implementation of our structure, and provide it with a new function so we can make a new instance of our Cache object. This takes in a closure. And initializes it with none since we have never run our function yet.
+
+When value is called for the first time we provide an argument every subsequent call to it will just return our value we do this  with a match expression. This makes sure that we only call the closure once.
+
+We can now rework our calculation code as such:
+
+```rust
+fn generate_workout(intensity: u32, random_number: u32) {
+    let mut calculated = Cache::new(|num : u32| -> u32 {
+        println!("calculating slowly...");
+        thread::sleep(Duration::from_secs(2));
+        return num;
+    });
+
+    if intensity < 25 {
+        println!("Today, do {} pushups!",calculated.value(intensity));
+        println!("Next, do {} situps!",calculated.value(intensity));
+    } else {
+        if random_number == 3 {
+            println!("Take a break today! Remember to stay hydrated!");
+        } else {
+            println!("Today, run for {} minutes!",calculated.value(intensity));
+        }
+    }
+}
+```
+
+This has a couple of limitations the first limitation this approach has is that it just accepts the first parameter for intensity so if we use different intesities this will just return the cached value.
+
+This implementation is the following:
+
+```rust
+impl<T> Cache<T> where T: Fn(u32) -> u32 {
+    fn new(calculation: T) -> Cache<T>{
+        Cache{
+            func: calculation,
+            result: HashMap::new()
+        }
+    }
+
+    fn value(&mut self,arg: u32) -> u32{
+        return match self.result.contains_key(&arg) {
+            true => {
+                self.result.get(&arg).expect("Something went wrong").to_owned()
+            }
+            false => {
+                let v = (self.func)(arg);
+                self.result.insert(arg, v);
+                v
+            }
+        }
+    }
+}
+```
+
+We can also make our 
+
