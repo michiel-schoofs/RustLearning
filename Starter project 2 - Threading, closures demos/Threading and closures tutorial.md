@@ -1,5 +1,7 @@
 # Threading and closures tutorial
 
+## Project start
+
 We're going to build a library to make our own threadpooling. This is just to get familiar with the concept of libraries and threadings and also testing. The first thing is obviously to start a new project using cargo. this time we're gonna write a library so we use the command `cargo new --lib threadpool` .
 
 So let's first define our global sturcture. We need a public structure so other applications can interface with our structure but we don't know what we have to write in there just yet. Let's also provide an implementation for this structure as we've seen in our first project. Let's also make a new function so we can make an instance of our Thread pool and lets also make an execute function so we can actually execute the tasks in our thread pool. 
@@ -232,5 +234,61 @@ impl<T> Cache<T> where T: Fn(u32) -> u32 {
 }
 ```
 
-We can also make our 
+## Project continued
+
+So now that we know what closures are we can talk about our execute function. The idea behind our execute function is that we're able to execute our closure on a different thread so we make a multithreaded environment.
+
+```rust
+threadPool.execute(||{println!("Hello from thread1");});
+threadPool.execute(||{println!("Hello from thread2");});
+```
+
+We want to be able to pass it like this.
+
+We've already seen that closures implements the Fn trait so we're able to pass it in our function using a generic parameter like this:
+
+```rust
+fn execute<T: Fn()>(&self, function:T){}
+```
+
+So now we can execute the function here.
+
+Now what we want to do is add a bunch of threads where we can execute the function themselves here we can add a new parameter to our 'constructor like' function specifying the number of threads we want. Now we iterate over the num_threads and we make a thread by calling `std::thread::spawn(||{})`.
+
+```rust
+    fn new(num_threads: u8) -> Self {
+        for _ in 0..num_threads{
+            let handle: JoinHandle<()> = std::thread::spawn(||{});
+        };
+        Self
+    }
+```
+
+So a couple of new things to not here is our new for loop syntax but this is quite straight forward so we won't be diving in to those. Our std::thread::spawn call wants a function so we pass in just an empty closure that does nothing and we get back a handle for this thread. So now we can store our handles. We use a new type for this called a vector which is basically like a typed array.
+
+```rust
+pub struct ThreadPool{
+    _handles: Vec<std::thread::JoinHandle<()>>
+}
+```
+
+Now just as in dotnet we have a sort of linq syntax to collect everything together and map everything so we can rewrite our new function to get our vector in only a few lines:
+
+```rust
+(0..num_threads).map(|_|{
+	std::thread::spawn(||{});
+})
+```
+
+This does the exact same thing as our for loop with the exception that we can now call a function collect on it to collect all of the end results of the map function into a vector.
+
+````rust
+fn new(num_threads: u8) -> Self {
+	let _handles: Vec<JoinHandle<()>> = (0..num_threads).map(|_|{
+		std::thread::spawn(||{});
+	}).collect();
+        
+	Self{_handles}
+}
+````
 
