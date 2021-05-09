@@ -4,6 +4,7 @@ Each project has some .md files.
 I don't really like reading trough tutorials as I find it very boring and not the most efficient way of learning.
 I personally enjoy learning trough example with videos and someone explaining their code to me.
 So these are sample projects I made trough video tutorials with notes to help me understand what I'm doing.
+Unfortunatly I'm sometimes also forced to read the rust book so I will be providing a comprehensive tutorial of the rust book as well.
 
 ## Table of contents
 
